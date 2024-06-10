@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyos
+  labels:
+    app: vyos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vyos
+  template:
+    metadata:
+      labels:
+        app: vyos
+      annotations:
+        k8s.v1.cni.cncf.io/networks: default/vxlan1
+    spec:
+      containers:
+      - name: vyos
+        image: tjjh89017/vyos-k8s:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
