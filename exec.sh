@@ -5,7 +5,7 @@ then
 load /config/config.temp
 commit
 else
-load /opt/vyatta/etc/config.boot.default
+load /config/config.boot
 commit
 fi
 source /config/config.command
