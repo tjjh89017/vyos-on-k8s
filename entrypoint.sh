@@ -1,24 +1,36 @@
 #!/bin/bash
 
+function exec_sh() {
+	EXEC_SH=$(cat /work/exec.sh | base64 -w 0)
+	# open file
+	FD=$(virsh qemu-agent-command vyos '{"execute": "guest-file-open", "arguments": {"path": "/config/exec.sh", "mode": "w"}}' | jq -r .return)
+	# write file
+	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "arguments": {"handle": '"$FD"', "buf-b64": "'"$EXEC_SH"'"}}'
+	# close file
+	virsh qemu-agent-command vyos '{"execute": "guest-file-close", "arguments": {"handle": '"$FD"'}}'
+
+}
+
 function sync() {
-	CONFIG_BOOT=$(cat /config/config.boot | base64)
-	CONFIG_COMMAND=$(cat /config/config.command | base64)
+	CONFIG_BOOT=$(cat /config/config.boot | base64 -w 0)
+	CONFIG_COMMAND=$(cat /config/config.command | base64 -w 0)
 
 	# open file
 	FD=$(virsh qemu-agent-command vyos '{"execute": "guest-file-open", "arguments": {"path": "/config/config.temp", "mode": "w"}}' | jq -r .return)
 	# write file
-	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "handle": '"$FD"', "buf-b64": '"$CONFIG_BOOT"'}'
+	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "arguments": {"handle": '"$FD"', "buf-b64": "'"$CONFIG_BOOT"'"}}'
 	# close file
-	virsh qemu-agent-command vyos '{"execute": "guest-file-open", "handle": '"$FD"'}'
+	virsh qemu-agent-command vyos '{"execute": "guest-file-close", "arguments": {"handle": '"$FD"'}}'
 
 	# open file
 	FD=$(virsh qemu-agent-command vyos '{"execute": "guest-file-open", "arguments": {"path": "/config/config.command", "mode": "w"}}' | jq -r .return)
 	# write file
-	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "handle": '"$FD"', "buf-b64": '"$CONFIG_COMMAND"'}'
+	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "arguments": {"handle": '"$FD"', "buf-b64": "'"$CONFIG_COMMAND"'"}}'
 	# close file
-	virsh qemu-agent-command vyos '{"execute": "guest-file-open", "handle": '"$FD"'}'
+	virsh qemu-agent-command vyos '{"execute": "guest-file-close", "arguments": {"handle": '"$FD"'}}'
 
-	# load config
+	# TODO load config
+	virsh qemu-agent-command vyos '{"execute": "guest-exec", "arguments": {"path": "vbash", "arg": ["/config/exec.sh"]}}'
 }
 
 # disk is in /data/vyos.qcow2
@@ -88,16 +100,20 @@ done
 echo "VyOS router is ready"
 
 sleep 10s
-sync()
+exec_sh
+sleep 1s
+sync
 
 # load config
 # load from /config (in container)
 # /config/config.boot
 # /config/config.command
-inotifywait -e delete_self -m -r /config/config.boot /config/config.command | while read f
+
+inotifywait -e delete_self -m -r /config/config.boot /config/config.command | 
+while read f
 do
 	echo "CONFIG CHANGED"
-	sync()
+	sync
 done
 
 sleep infinity

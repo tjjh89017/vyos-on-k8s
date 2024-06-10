@@ -13,6 +13,7 @@ RUN apt update && apt install -y --no-install-recommends iproute2 \
 # Debug
 RUN apt install -y vim
 
+COPY exec.sh .
 COPY entrypoint.sh .
 COPY vyos-*.qcow2 vyos.qcow2
 
