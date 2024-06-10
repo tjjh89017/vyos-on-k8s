@@ -19,11 +19,9 @@ until virsh list --all 2>&1 > /dev/null ; do
 done
 
 # virt-install
-virt-install --name vyos --memory 2048 --disk "$DISK" --network none --os-variant debiantesting --import --nographic --noautoconsole --print-xml | tee vyos.xml
+virt-install --name vyos --vcpus=2 --memory 2048 --disk "$DISK" --network none --os-variant debiantesting --import --nographic --noautoconsole --print-xml | tee vyos.xml
 
 virsh define vyos.xml
-
-virsh attach-device --config --domain vyos --file qemu-ga.xml
 
 # setup interface bridge for VM
 # ignore eth0
@@ -40,7 +38,33 @@ done
 
 virsh start vyos
 
-# TODO
-# qemu ga
+while ! virsh qemu-agent-command vyos '{"execute": "guest-ping"}'
+do
+	echo 'wait for qemu ga'
+	sleep 10s
+done
+
+# wait for vyos-router ready
+while :
+do
+	sleep 10s
+	echo "wait for vyos-router ready"
+	#systemctl show vyos-router | grep -E 'ActiveState=active|SubState=exited'
+	PID=$(virsh qemu-agent-command vyos '{"execute": "guest-exec", "arguments": {"path": "/bin/vbash", "arg": ["-c", "systemctl show vyos-router | grep -E \"ActiveState=active|SubState=exited\""], "capture-output": true}}' | jq -r .return.pid )
+	#echo $PID
+	sleep 1s
+	RESULT=$(virsh qemu-agent-command vyos '{"execute": "guest-exec-status", "arguments": { "pid": '$PID'}}')
+	EXITCODE=$(echo $RESULT | jq -r .return.exitcode)
+	EXITED=$(echo $RESULT | jq -r .return.exited)
+	OUT_DATA=$(echo $RESULT | jq -r '.return."out-data"')
+	if [ "$EXITED" = "true" -a "$EXITCODE" = 0 -a "$OUT_DATA" = "QWN0aXZlU3RhdGU9YWN0aXZlClN1YlN0YXRlPWV4aXRlZAo=" ]
+	then
+		break
+	fi
+done
+
+echo "VyOS router is ready"
+
+# TODO load config
 
 sleep infinity
