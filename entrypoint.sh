@@ -1,8 +1,30 @@
 #!/bin/bash
 
+function sync() {
+	CONFIG_BOOT=$(cat /config/config.boot | base64)
+	CONFIG_COMMAND=$(cat /config/config.command | base64)
+
+	# open file
+	FD=$(virsh qemu-agent-command vyos '{"execute": "guest-file-open", "arguments": {"path": "/config/config.temp", "mode": "w"}}' | jq -r .return)
+	# write file
+	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "handle": '"$FD"', "buf-b64": '"$CONFIG_BOOT"'}'
+	# close file
+	virsh qemu-agent-command vyos '{"execute": "guest-file-open", "handle": '"$FD"'}'
+
+	# open file
+	FD=$(virsh qemu-agent-command vyos '{"execute": "guest-file-open", "arguments": {"path": "/config/config.command", "mode": "w"}}' | jq -r .return)
+	# write file
+	virsh qemu-agent-command vyos '{"execute": "guest-file-write", "handle": '"$FD"', "buf-b64": '"$CONFIG_COMMAND"'}'
+	# close file
+	virsh qemu-agent-command vyos '{"execute": "guest-file-open", "handle": '"$FD"'}'
+
+	# load config
+}
+
 # disk is in /data/vyos.qcow2
 # mount PVC on /data to persist config and disk
 mkdir -p /data
+mkdir -p /config
 DISK="/data/vyos.qcow2"
 if [ ! -f "$DISK" ]; then
 	cp -a "vyos.qcow2" "$DISK"
@@ -65,6 +87,17 @@ done
 
 echo "VyOS router is ready"
 
-# TODO load config
+sleep 10s
+sync()
+
+# load config
+# load from /config (in container)
+# /config/config.boot
+# /config/config.command
+inotifywait -e delete_self -m -r /config/config.boot /config/config.command | while read f
+do
+	echo "CONFIG CHANGED"
+	sync()
+done
 
 sleep infinity
