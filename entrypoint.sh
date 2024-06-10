@@ -30,6 +30,7 @@ function sync() {
 	virsh qemu-agent-command vyos '{"execute": "guest-file-close", "arguments": {"handle": '"$FD"'}}'
 
 	# TODO load config
+	sleep 5s
 	virsh qemu-agent-command vyos '{"execute": "guest-exec", "arguments": {"path": "vbash", "arg": ["/config/exec.sh"]}}'
 }
 
