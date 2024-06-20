@@ -1,0 +1,376 @@
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vxlan-all
+  namespace: default
+spec:
+  config: |
+    {"cniVersion":"0.3.1","name":"vxlan1","type":"bridge","bridge":"vxlan-br","promiscMode":true,"vlanTrunk": [{"minID": 2, "maxID": 4094}],"ipam":{}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vyos-evpn-spine1
+data:
+  config.boot: ""
+  config.command: |
+    set interfaces ethernet eth0 address '1.1.1.1/24'
+    set protocols bgp address-family l2vpn-evpn advertise-all-vni
+    set protocols bgp address-family l2vpn-evpn advertise-default-gw
+    set protocols bgp listen range 1.1.1.0/24 peer-group 'PEER'
+    set protocols bgp peer-group PEER address-family l2vpn-evpn route-reflector-client
+    set protocols bgp peer-group PEER address-family l2vpn-evpn soft-reconfiguration inbound
+    set protocols bgp peer-group PEER remote-as 'internal'
+    set protocols bgp system-as '65000'
+    set protocols bgp timers holdtime '3'
+    set protocols bgp timers keepalive '1'
+    set system host-name 'spine1'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vyos-evpn-h1
+data:
+  config.boot: ""
+  config.command: |
+    set interfaces bridge br0 enable-vlan
+    set interfaces bridge br0 member interface eth1 allowed-vlan '2-4094'
+    set interfaces bridge br0 member interface vxlan1 allowed-vlan '2-4094'
+    set interfaces ethernet eth0 address '1.1.1.3/24'
+    set interfaces vxlan vxlan1 mtu '1450'
+    set interfaces vxlan vxlan1 parameters external
+    set interfaces vxlan vxlan1 parameters nolearning
+    set interfaces vxlan vxlan1 source-interface 'eth0'
+    set interfaces vxlan vxlan1 vlan-to-vni 2 vni '10002'
+    set interfaces vxlan vxlan1 vlan-to-vni 3 vni '10003'
+    set interfaces vxlan vxlan1 vlan-to-vni 4 vni '10004'
+    set interfaces vxlan vxlan1 vlan-to-vni 5 vni '10005'
+    set interfaces vxlan vxlan1 vlan-to-vni 6 vni '10006'
+    set interfaces vxlan vxlan1 vlan-to-vni 7 vni '10007'
+    set interfaces vxlan vxlan1 vlan-to-vni 8 vni '10008'
+    set interfaces vxlan vxlan1 vlan-to-vni 9 vni '10009'
+    set interfaces vxlan vxlan1 vlan-to-vni 10 vni '10010'
+    set interfaces vxlan vxlan1 vlan-to-vni 11 vni '10011'
+    set interfaces vxlan vxlan1 vlan-to-vni 12 vni '10012'
+    set interfaces vxlan vxlan1 vlan-to-vni 13 vni '10013'
+    set interfaces vxlan vxlan1 vlan-to-vni 14 vni '10014'
+    set interfaces vxlan vxlan1 vlan-to-vni 15 vni '10015'
+    set interfaces vxlan vxlan1 vlan-to-vni 16 vni '10016'
+    set interfaces vxlan vxlan1 vlan-to-vni 17 vni '10017'
+    set interfaces vxlan vxlan1 vlan-to-vni 18 vni '10018'
+    set interfaces vxlan vxlan1 vlan-to-vni 19 vni '10019'
+    set interfaces vxlan vxlan1 vlan-to-vni 20 vni '10020'
+    set interfaces vxlan vxlan1 vlan-to-vni 21 vni '10021'
+    set interfaces vxlan vxlan1 vlan-to-vni 22 vni '10022'
+    set interfaces vxlan vxlan1 vlan-to-vni 23 vni '10023'
+    set interfaces vxlan vxlan1 vlan-to-vni 24 vni '10024'
+    set interfaces vxlan vxlan1 vlan-to-vni 25 vni '10025'
+    set interfaces vxlan vxlan1 vlan-to-vni 26 vni '10026'
+    set interfaces vxlan vxlan1 vlan-to-vni 27 vni '10027'
+    set interfaces vxlan vxlan1 vlan-to-vni 28 vni '10028'
+    set interfaces vxlan vxlan1 vlan-to-vni 29 vni '10029'
+    set interfaces vxlan vxlan1 vlan-to-vni 30 vni '10030'
+    set interfaces vxlan vxlan1 vlan-to-vni 31 vni '10031'
+    set interfaces vxlan vxlan1 vlan-to-vni 32 vni '10032'
+    set interfaces vxlan vxlan1 vlan-to-vni 33 vni '10033'
+    set interfaces vxlan vxlan1 vlan-to-vni 34 vni '10034'
+    set interfaces vxlan vxlan1 vlan-to-vni 35 vni '10035'
+    set interfaces vxlan vxlan1 vlan-to-vni 36 vni '10036'
+    set interfaces vxlan vxlan1 vlan-to-vni 37 vni '10037'
+    set interfaces vxlan vxlan1 vlan-to-vni 38 vni '10038'
+    set interfaces vxlan vxlan1 vlan-to-vni 39 vni '10039'
+    set interfaces vxlan vxlan1 vlan-to-vni 40 vni '10040'
+    set interfaces vxlan vxlan1 vlan-to-vni 41 vni '10041'
+    set interfaces vxlan vxlan1 vlan-to-vni 42 vni '10042'
+    set interfaces vxlan vxlan1 vlan-to-vni 43 vni '10043'
+    set interfaces vxlan vxlan1 vlan-to-vni 44 vni '10044'
+    set interfaces vxlan vxlan1 vlan-to-vni 45 vni '10045'
+    set interfaces vxlan vxlan1 vlan-to-vni 46 vni '10046'
+    set interfaces vxlan vxlan1 vlan-to-vni 47 vni '10047'
+    set interfaces vxlan vxlan1 vlan-to-vni 48 vni '10048'
+    set interfaces vxlan vxlan1 vlan-to-vni 49 vni '10049'
+    set interfaces vxlan vxlan1 vlan-to-vni 50 vni '10050'
+    set interfaces vxlan vxlan1 vlan-to-vni 51 vni '10051'
+    set interfaces vxlan vxlan1 vlan-to-vni 52 vni '10052'
+    set interfaces vxlan vxlan1 vlan-to-vni 53 vni '10053'
+    set interfaces vxlan vxlan1 vlan-to-vni 54 vni '10054'
+    set interfaces vxlan vxlan1 vlan-to-vni 55 vni '10055'
+    set interfaces vxlan vxlan1 vlan-to-vni 56 vni '10056'
+    set interfaces vxlan vxlan1 vlan-to-vni 57 vni '10057'
+    set interfaces vxlan vxlan1 vlan-to-vni 58 vni '10058'
+    set interfaces vxlan vxlan1 vlan-to-vni 59 vni '10059'
+    set interfaces vxlan vxlan1 vlan-to-vni 60 vni '10060'
+    set interfaces vxlan vxlan1 vlan-to-vni 61 vni '10061'
+    set interfaces vxlan vxlan1 vlan-to-vni 62 vni '10062'
+    set interfaces vxlan vxlan1 vlan-to-vni 63 vni '10063'
+    set interfaces vxlan vxlan1 vlan-to-vni 64 vni '10064'
+    set interfaces vxlan vxlan1 vlan-to-vni 65 vni '10065'
+    set interfaces vxlan vxlan1 vlan-to-vni 66 vni '10066'
+    set interfaces vxlan vxlan1 vlan-to-vni 67 vni '10067'
+    set interfaces vxlan vxlan1 vlan-to-vni 68 vni '10068'
+    set interfaces vxlan vxlan1 vlan-to-vni 69 vni '10069'
+    set interfaces vxlan vxlan1 vlan-to-vni 70 vni '10070'
+    set interfaces vxlan vxlan1 vlan-to-vni 71 vni '10071'
+    set interfaces vxlan vxlan1 vlan-to-vni 72 vni '10072'
+    set interfaces vxlan vxlan1 vlan-to-vni 73 vni '10073'
+    set interfaces vxlan vxlan1 vlan-to-vni 74 vni '10074'
+    set interfaces vxlan vxlan1 vlan-to-vni 75 vni '10075'
+    set interfaces vxlan vxlan1 vlan-to-vni 76 vni '10076'
+    set interfaces vxlan vxlan1 vlan-to-vni 77 vni '10077'
+    set interfaces vxlan vxlan1 vlan-to-vni 78 vni '10078'
+    set interfaces vxlan vxlan1 vlan-to-vni 79 vni '10079'
+    set interfaces vxlan vxlan1 vlan-to-vni 80 vni '10080'
+    set interfaces vxlan vxlan1 vlan-to-vni 81 vni '10081'
+    set interfaces vxlan vxlan1 vlan-to-vni 82 vni '10082'
+    set interfaces vxlan vxlan1 vlan-to-vni 83 vni '10083'
+    set interfaces vxlan vxlan1 vlan-to-vni 84 vni '10084'
+    set interfaces vxlan vxlan1 vlan-to-vni 85 vni '10085'
+    set interfaces vxlan vxlan1 vlan-to-vni 86 vni '10086'
+    set interfaces vxlan vxlan1 vlan-to-vni 87 vni '10087'
+    set interfaces vxlan vxlan1 vlan-to-vni 88 vni '10088'
+    set interfaces vxlan vxlan1 vlan-to-vni 89 vni '10089'
+    set interfaces vxlan vxlan1 vlan-to-vni 90 vni '10090'
+    set interfaces vxlan vxlan1 vlan-to-vni 91 vni '10091'
+    set interfaces vxlan vxlan1 vlan-to-vni 92 vni '10092'
+    set interfaces vxlan vxlan1 vlan-to-vni 93 vni '10093'
+    set interfaces vxlan vxlan1 vlan-to-vni 94 vni '10094'
+    set interfaces vxlan vxlan1 vlan-to-vni 95 vni '10095'
+    set interfaces vxlan vxlan1 vlan-to-vni 96 vni '10096'
+    set interfaces vxlan vxlan1 vlan-to-vni 97 vni '10097'
+    set interfaces vxlan vxlan1 vlan-to-vni 98 vni '10098'
+    set interfaces vxlan vxlan1 vlan-to-vni 99 vni '10099'
+    set interfaces vxlan vxlan1 vlan-to-vni 100 vni '10100'
+    set protocols bgp address-family l2vpn-evpn advertise-all-vni
+    set protocols bgp address-family l2vpn-evpn advertise-default-gw
+    set protocols bgp neighbor 1.1.1.1 peer-group 'PEER'
+    set protocols bgp peer-group PEER address-family l2vpn-evpn soft-reconfiguration inbound
+    set protocols bgp peer-group PEER remote-as 'internal'
+    set protocols bgp system-as '65000'
+    set protocols bgp timers holdtime '3'
+    set protocols bgp timers keepalive '1'
+    set system host-name 'h1'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vyos-evpn-h2
+data:
+  config.boot: ""
+  config.command: |
+    set interfaces bridge br0 enable-vlan
+    set interfaces bridge br0 member interface eth1 allowed-vlan '2-4094'
+    set interfaces bridge br0 member interface vxlan1 allowed-vlan '2-4094'
+    set interfaces ethernet eth0 address '1.1.1.4/24'
+    set interfaces vxlan vxlan1 mtu '1450'
+    set interfaces vxlan vxlan1 parameters external
+    set interfaces vxlan vxlan1 parameters nolearning
+    set interfaces vxlan vxlan1 source-interface 'eth0'
+    set interfaces vxlan vxlan1 vlan-to-vni 2 vni '10002'
+    set interfaces vxlan vxlan1 vlan-to-vni 3 vni '10003'
+    set interfaces vxlan vxlan1 vlan-to-vni 4 vni '10004'
+    set interfaces vxlan vxlan1 vlan-to-vni 5 vni '10005'
+    set interfaces vxlan vxlan1 vlan-to-vni 6 vni '10006'
+    set interfaces vxlan vxlan1 vlan-to-vni 7 vni '10007'
+    set interfaces vxlan vxlan1 vlan-to-vni 8 vni '10008'
+    set interfaces vxlan vxlan1 vlan-to-vni 9 vni '10009'
+    set interfaces vxlan vxlan1 vlan-to-vni 10 vni '10010'
+    set interfaces vxlan vxlan1 vlan-to-vni 11 vni '10011'
+    set interfaces vxlan vxlan1 vlan-to-vni 12 vni '10012'
+    set interfaces vxlan vxlan1 vlan-to-vni 13 vni '10013'
+    set interfaces vxlan vxlan1 vlan-to-vni 14 vni '10014'
+    set interfaces vxlan vxlan1 vlan-to-vni 15 vni '10015'
+    set interfaces vxlan vxlan1 vlan-to-vni 16 vni '10016'
+    set interfaces vxlan vxlan1 vlan-to-vni 17 vni '10017'
+    set interfaces vxlan vxlan1 vlan-to-vni 18 vni '10018'
+    set interfaces vxlan vxlan1 vlan-to-vni 19 vni '10019'
+    set interfaces vxlan vxlan1 vlan-to-vni 20 vni '10020'
+    set interfaces vxlan vxlan1 vlan-to-vni 21 vni '10021'
+    set interfaces vxlan vxlan1 vlan-to-vni 22 vni '10022'
+    set interfaces vxlan vxlan1 vlan-to-vni 23 vni '10023'
+    set interfaces vxlan vxlan1 vlan-to-vni 24 vni '10024'
+    set interfaces vxlan vxlan1 vlan-to-vni 25 vni '10025'
+    set interfaces vxlan vxlan1 vlan-to-vni 26 vni '10026'
+    set interfaces vxlan vxlan1 vlan-to-vni 27 vni '10027'
+    set interfaces vxlan vxlan1 vlan-to-vni 28 vni '10028'
+    set interfaces vxlan vxlan1 vlan-to-vni 29 vni '10029'
+    set interfaces vxlan vxlan1 vlan-to-vni 30 vni '10030'
+    set interfaces vxlan vxlan1 vlan-to-vni 31 vni '10031'
+    set interfaces vxlan vxlan1 vlan-to-vni 32 vni '10032'
+    set interfaces vxlan vxlan1 vlan-to-vni 33 vni '10033'
+    set interfaces vxlan vxlan1 vlan-to-vni 34 vni '10034'
+    set interfaces vxlan vxlan1 vlan-to-vni 35 vni '10035'
+    set interfaces vxlan vxlan1 vlan-to-vni 36 vni '10036'
+    set interfaces vxlan vxlan1 vlan-to-vni 37 vni '10037'
+    set interfaces vxlan vxlan1 vlan-to-vni 38 vni '10038'
+    set interfaces vxlan vxlan1 vlan-to-vni 39 vni '10039'
+    set interfaces vxlan vxlan1 vlan-to-vni 40 vni '10040'
+    set interfaces vxlan vxlan1 vlan-to-vni 41 vni '10041'
+    set interfaces vxlan vxlan1 vlan-to-vni 42 vni '10042'
+    set interfaces vxlan vxlan1 vlan-to-vni 43 vni '10043'
+    set interfaces vxlan vxlan1 vlan-to-vni 44 vni '10044'
+    set interfaces vxlan vxlan1 vlan-to-vni 45 vni '10045'
+    set interfaces vxlan vxlan1 vlan-to-vni 46 vni '10046'
+    set interfaces vxlan vxlan1 vlan-to-vni 47 vni '10047'
+    set interfaces vxlan vxlan1 vlan-to-vni 48 vni '10048'
+    set interfaces vxlan vxlan1 vlan-to-vni 49 vni '10049'
+    set interfaces vxlan vxlan1 vlan-to-vni 50 vni '10050'
+    set interfaces vxlan vxlan1 vlan-to-vni 51 vni '10051'
+    set interfaces vxlan vxlan1 vlan-to-vni 52 vni '10052'
+    set interfaces vxlan vxlan1 vlan-to-vni 53 vni '10053'
+    set interfaces vxlan vxlan1 vlan-to-vni 54 vni '10054'
+    set interfaces vxlan vxlan1 vlan-to-vni 55 vni '10055'
+    set interfaces vxlan vxlan1 vlan-to-vni 56 vni '10056'
+    set interfaces vxlan vxlan1 vlan-to-vni 57 vni '10057'
+    set interfaces vxlan vxlan1 vlan-to-vni 58 vni '10058'
+    set interfaces vxlan vxlan1 vlan-to-vni 59 vni '10059'
+    set interfaces vxlan vxlan1 vlan-to-vni 60 vni '10060'
+    set interfaces vxlan vxlan1 vlan-to-vni 61 vni '10061'
+    set interfaces vxlan vxlan1 vlan-to-vni 62 vni '10062'
+    set interfaces vxlan vxlan1 vlan-to-vni 63 vni '10063'
+    set interfaces vxlan vxlan1 vlan-to-vni 64 vni '10064'
+    set interfaces vxlan vxlan1 vlan-to-vni 65 vni '10065'
+    set interfaces vxlan vxlan1 vlan-to-vni 66 vni '10066'
+    set interfaces vxlan vxlan1 vlan-to-vni 67 vni '10067'
+    set interfaces vxlan vxlan1 vlan-to-vni 68 vni '10068'
+    set interfaces vxlan vxlan1 vlan-to-vni 69 vni '10069'
+    set interfaces vxlan vxlan1 vlan-to-vni 70 vni '10070'
+    set interfaces vxlan vxlan1 vlan-to-vni 71 vni '10071'
+    set interfaces vxlan vxlan1 vlan-to-vni 72 vni '10072'
+    set interfaces vxlan vxlan1 vlan-to-vni 73 vni '10073'
+    set interfaces vxlan vxlan1 vlan-to-vni 74 vni '10074'
+    set interfaces vxlan vxlan1 vlan-to-vni 75 vni '10075'
+    set interfaces vxlan vxlan1 vlan-to-vni 76 vni '10076'
+    set interfaces vxlan vxlan1 vlan-to-vni 77 vni '10077'
+    set interfaces vxlan vxlan1 vlan-to-vni 78 vni '10078'
+    set interfaces vxlan vxlan1 vlan-to-vni 79 vni '10079'
+    set interfaces vxlan vxlan1 vlan-to-vni 80 vni '10080'
+    set interfaces vxlan vxlan1 vlan-to-vni 81 vni '10081'
+    set interfaces vxlan vxlan1 vlan-to-vni 82 vni '10082'
+    set interfaces vxlan vxlan1 vlan-to-vni 83 vni '10083'
+    set interfaces vxlan vxlan1 vlan-to-vni 84 vni '10084'
+    set interfaces vxlan vxlan1 vlan-to-vni 85 vni '10085'
+    set interfaces vxlan vxlan1 vlan-to-vni 86 vni '10086'
+    set interfaces vxlan vxlan1 vlan-to-vni 87 vni '10087'
+    set interfaces vxlan vxlan1 vlan-to-vni 88 vni '10088'
+    set interfaces vxlan vxlan1 vlan-to-vni 89 vni '10089'
+    set interfaces vxlan vxlan1 vlan-to-vni 90 vni '10090'
+    set interfaces vxlan vxlan1 vlan-to-vni 91 vni '10091'
+    set interfaces vxlan vxlan1 vlan-to-vni 92 vni '10092'
+    set interfaces vxlan vxlan1 vlan-to-vni 93 vni '10093'
+    set interfaces vxlan vxlan1 vlan-to-vni 94 vni '10094'
+    set interfaces vxlan vxlan1 vlan-to-vni 95 vni '10095'
+    set interfaces vxlan vxlan1 vlan-to-vni 96 vni '10096'
+    set interfaces vxlan vxlan1 vlan-to-vni 97 vni '10097'
+    set interfaces vxlan vxlan1 vlan-to-vni 98 vni '10098'
+    set interfaces vxlan vxlan1 vlan-to-vni 99 vni '10099'
+    set interfaces vxlan vxlan1 vlan-to-vni 100 vni '10100'
+    set protocols bgp address-family l2vpn-evpn advertise-all-vni
+    set protocols bgp address-family l2vpn-evpn advertise-default-gw
+    set protocols bgp neighbor 1.1.1.1 peer-group 'PEER'
+    set protocols bgp peer-group PEER address-family l2vpn-evpn soft-reconfiguration inbound
+    set protocols bgp peer-group PEER remote-as 'internal'
+    set protocols bgp system-as '65000'
+    set protocols bgp timers holdtime '3'
+    set protocols bgp timers keepalive '1'
+    set system host-name 'h2'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyos-spine1
+  labels:
+    app: vyos-spine1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vyos-spine1
+  template:
+    metadata:
+      labels:
+        app: vyos-spine1
+      annotations:
+        k8s.v1.cni.cncf.io/networks: default/mgmt, default/vxlan-all
+    spec:
+      containers:
+      - name: vyos
+        image: tjjh89017/vyos-k8s:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: config
+            mountPath: "/config"
+      volumes:
+        - name: config
+          configMap:
+            name: vyos-evpn-spine1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyos-h1
+  labels:
+    app: vyos-h1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vyos-h1
+  template:
+    metadata:
+      labels:
+        app: vyos-h1
+      annotations:
+        k8s.v1.cni.cncf.io/networks: default/mgmt, default/vxlan-all
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: h1
+      containers:
+      - name: vyos
+        image: tjjh89017/vyos-k8s:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: config
+            mountPath: "/config"
+      volumes:
+        - name: config
+          configMap:
+            name: vyos-evpn-h1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyos-h2
+  labels:
+    app: vyos-h2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vyos-h2
+  template:
+    metadata:
+      labels:
+        app: vyos-h2
+      annotations:
+        k8s.v1.cni.cncf.io/networks: default/mgmt, default/vxlan-all
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: h2
+      containers:
+      - name: vyos
+        image: tjjh89017/vyos-k8s:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: config
+            mountPath: "/config"
+      volumes:
+        - name: config
+          configMap:
+            name: vyos-evpn-h2

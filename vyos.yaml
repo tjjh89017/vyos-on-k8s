@@ -74,7 +74,7 @@ spec:
       labels:
         app: vyos
       annotations:
-        k8s.v1.cni.cncf.io/networks: default/vxlan1
+        k8s.v1.cni.cncf.io/networks: default/vxlan2
     spec:
       containers:
       - name: vyos
