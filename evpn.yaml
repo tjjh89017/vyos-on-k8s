@@ -40,6 +40,7 @@ data:
     set interfaces ethernet eth0 address '1.1.1.3/24'
     set interfaces vxlan vxlan1 mtu '1450'
     set interfaces vxlan vxlan1 parameters external
+    set interfaces vxlan vxlan1 parameters vni-filter
     set interfaces vxlan vxlan1 parameters nolearning
     set interfaces vxlan vxlan1 source-interface 'eth0'
     set interfaces vxlan vxlan1 vlan-to-vni 2 vni '10002'
@@ -164,6 +165,7 @@ data:
     set interfaces ethernet eth0 address '1.1.1.4/24'
     set interfaces vxlan vxlan1 mtu '1450'
     set interfaces vxlan vxlan1 parameters external
+    set interfaces vxlan vxlan1 parameters vni-filter
     set interfaces vxlan vxlan1 parameters nolearning
     set interfaces vxlan vxlan1 source-interface 'eth0'
     set interfaces vxlan vxlan1 vlan-to-vni 2 vni '10002'
