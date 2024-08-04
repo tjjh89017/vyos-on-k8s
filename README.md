@@ -1,5 +1,9 @@
 # vyos-on-k8s
 
+WARNING!!!
+This is a PoC only.
+The code is unstable.
+
 ## Build VyOS KVM image
 
 1. Clone `vyos-build` from github [vyos-build](https://github.com/vyos/vyos-build)
