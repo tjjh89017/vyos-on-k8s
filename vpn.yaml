@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vyos-vpn
+data:
+  config.boot: ""
+  config.command: |
+    set system host-name 'vyos-vpn'
+    set interfaces ethernet eth0 address 'dhcp'
+    set interfaces ethernet eth1 address '192.168.0.1/24'
+    set interfaces wireguard wg0 address '192.168.100.1/24'
+    set interfaces wireguard wg0 ip adjust-mss '1380'
+    set interfaces wireguard wg0 ipv6 adjust-mss '1360'
+    set interfaces wireguard wg0 mtu '1420'
+    set interfaces wireguard wg0 peer user1 allowed-ips '192.168.100.2/32'
+    set interfaces wireguard wg0 peer user1 persistent-keepalive '15'
+    set interfaces wireguard wg0 peer user1 public-key 'd1rZyh5IcmNmP08R6zgNjVJbkNmxHWsRycNU7IIgv0I='
+    set interfaces wireguard wg0 per-client-thread
+    set interfaces wireguard wg0 port '5566'
+    set interfaces wireguard wg0 private-key '6BwWDF3lu5RJdIB+9MyhnSB7Lp2Y4Pnjtx3VRlu30kY='
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyos-vpn
+  labels:
+    app: vyos-vpn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vyos-vpn
+  template:
+    metadata:
+      labels:
+        app: vyos-vpn
+      annotations:
+        k8s.v1.cni.cncf.io/networks: default/mgmt, default/vxlan2
+    spec:
+      containers:
+      - name: vyos
+        image: tjjh89017/vyos-k8s:latest
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: config
+            mountPath: "/config"
+      volumes:
+        - name: config
+          configMap:
+            name: vyos-vpn
