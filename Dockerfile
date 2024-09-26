@@ -19,5 +19,5 @@ COPY vyos-*.qcow2 vyos.qcow2
 
 VOLUME ["/sys/fs/cgroup"]
 
-ENTRYPOINT /work/entrypoint.sh
+ENTRYPOINT ["/work/entrypoint.sh"]
 CMD ["bash"]

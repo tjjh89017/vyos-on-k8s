@@ -110,7 +110,7 @@ sync
 # /config/config.boot
 # /config/config.command
 
-inotifywait -e delete_self -m -r /config/config.boot /config/config.command | 
+inotifywait -e delete -m -r /config | 
 while read f
 do
 	echo "CONFIG CHANGED"
